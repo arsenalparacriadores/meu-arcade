@@ -106,9 +106,9 @@
     window.EJS_backgroundColor = "#000000";
 
     // SALVAMENTO NORMAL DO JOGO
-    window.EJS_fixedSaveInterval = 30000;
+    window.EJS_fixedSaveInterval = 10000;
 
-    // CONTROLES
+    // CONTROLES — MANTIDOS
     window.EJS_VirtualGamepadSettings = [
       {
         type: "dpad",
@@ -215,7 +215,7 @@
     let restoreFinished = false;
     let saveInProgress = false;
 
-    // Abre o banco interno do navegador.
+    // ABRIR BANCO DE DADOS
     function openSaveDatabase() {
       if (saveDatabase) {
         return Promise.resolve(saveDatabase);
@@ -252,7 +252,7 @@
       });
     }
 
-    // Grava o estado no banco do navegador.
+    // GRAVAR NO BANCO
     async function storeGameState(buffer) {
       const db = await openSaveDatabase();
 
@@ -273,7 +273,7 @@
       });
     }
 
-    // Recupera o último estado salvo.
+    // LER O ESTADO ANTERIOR
     async function readGameState() {
       const db = await openSaveDatabase();
 
@@ -292,9 +292,13 @@
       });
     }
 
-    // Salva o ponto exato em que o jogo está.
+    // SALVAR A PARTIDA ATUAL
     async function saveCurrentGame() {
-      if (!gameStarted || !restoreFinished || saveInProgress) {
+      if (
+        !gameStarted ||
+        !restoreFinished ||
+        saveInProgress
+      ) {
         return;
       }
 
@@ -309,25 +313,38 @@
       saveInProgress = true;
 
       try {
-        const state = await manager.getState();
+        const state = await Promise.resolve(manager.getState());
 
         if (!state || state.length === 0) {
           return;
         }
 
-        const buffer = new Uint8Array(state).slice().buffer;
+        const buffer = state instanceof ArrayBuffer
+          ? state.slice(0)
+          : new Uint8Array(state).slice().buffer;
+
+        if (buffer.byteLength < 1000) {
+          return;
+        }
 
         await storeGameState(buffer);
 
-        console.log("Progresso do Donkey Kong Country 3 salvo no navegador.");
+        console.log(
+          "Donkey Kong Country 3: progresso salvo."
+        );
+
       } catch (error) {
-        console.error("Erro ao salvar o progresso:", error);
+        console.error(
+          "Erro ao salvar o progresso:",
+          error
+        );
+
       } finally {
         saveInProgress = false;
       }
     }
 
-    // Restaura o último ponto salvo.
+    // RESTAURAR A PARTIDA ANTERIOR
     async function restorePreviousGame() {
       const manager =
         window.EJS_emulator &&
@@ -341,20 +358,33 @@
       try {
         const savedState = await readGameState();
 
-        if (savedState) {
-          manager.loadState(new Uint8Array(savedState));
-          console.log("Progresso anterior restaurado.");
+        if (savedState && savedState.byteLength > 1000) {
+          await Promise.resolve(
+            manager.loadState(new Uint8Array(savedState))
+          );
+
+          console.log(
+            "Donkey Kong Country 3: progresso restaurado."
+          );
+
         } else {
-          console.log("Nenhum progresso anterior encontrado.");
+          console.log(
+            "Nenhum estado anterior encontrado."
+          );
         }
+
       } catch (error) {
-        console.error("Erro ao restaurar o progresso:", error);
+        console.error(
+          "Erro ao restaurar o progresso:",
+          error
+        );
+
       } finally {
         restoreFinished = true;
       }
     }
 
-    // Chamado pelo EmulatorJS quando o jogo começa.
+    // QUANDO O JOGO COMEÇA
     window.EJS_onGameStart = function() {
       gameStarted = true;
       restoreFinished = false;
@@ -362,26 +392,25 @@
       restorePreviousGame();
     };
 
-    // Salvamento periódico: a cada 20 segundos.
+    // SALVAR A CADA 10 SEGUNDOS
     setInterval(function() {
       saveCurrentGame();
-    }, 20000);
+    }, 10000);
 
-    // Tenta salvar quando a pessoa troca de aba ou aplicativo.
+    // TENTAR SALVAR AO SAIR OU TROCAR DE APLICATIVO
     document.addEventListener("visibilitychange", function() {
       if (document.visibilityState === "hidden") {
         saveCurrentGame();
       }
     });
 
-    // Tenta salvar quando a página é fechada.
     window.addEventListener("pagehide", function() {
       saveCurrentGame();
     });
 
-    // MENSAGEM DE CARREGAMENTO
+    // EMULADOR PRONTO
     window.EJS_ready = function() {
-      console.log("DONKEY KONG COUNTRY 3 carregado.");
+      console.log("Donkey Kong Country 3 carregado.");
     };
 
     // CARREGAR EMULATORJS
