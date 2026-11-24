@@ -15,6 +15,7 @@
 
     html, body {
       margin: 0;
+      padding: 0;
       width: 100%;
       height: 100%;
       overflow: hidden;
@@ -24,91 +25,33 @@
     }
 
     body {
-      padding: 0;
-      touch-action: manipulation;
+      display: flex;
+      flex-direction: column;
     }
 
     #header {
-      position: absolute;
-      z-index: 1000;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 54px;
+      height: 42px;
+      min-height: 42px;
+      width: 100%;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: rgba(8, 11, 18, .92);
+      background: #080B12;
+      z-index: 5;
     }
 
     #header h1 {
       margin: 0;
-      font-size: 21px;
+      color: #fff;
+      font-size: 19px;
       letter-spacing: 1px;
     }
 
-    #menuButton {
-      position: absolute;
-      left: 14px;
-      top: 8px;
-      width: 42px;
-      height: 38px;
-      border: 0;
-      background: transparent;
-      color: white;
-      font-size: 29px;
-      cursor: pointer;
-    }
-
-    #menuPanel {
-      display: none;
-      position: absolute;
-      z-index: 1100;
-      top: 52px;
-      left: 10px;
-      width: 190px;
-      padding: 9px;
-      border: 1px solid #394355;
-      border-radius: 12px;
-      background: rgba(18, 25, 38, .97);
-      box-shadow: 0 8px 25px #0009;
-    }
-
-    #menuPanel.open {
-      display: block;
-    }
-
-    #menuPanel button {
-      display: block;
-      width: 100%;
-      padding: 12px;
-      margin: 3px 0;
-      color: white;
-      background: #263247;
-      border: 0;
-      border-radius: 8px;
-      font-size: 14px;
-      text-align: left;
-    }
-
-    #status {
-      position: absolute;
-      z-index: 10;
-      top: 57px;
-      left: 0;
-      right: 0;
-      text-align: center;
-      color: #55c8ff;
-      font-size: 12px;
-      pointer-events: none;
-    }
-
     #game {
-      position: absolute;
-      top: 54px;
-      left: 0;
+      position: relative;
       width: 100%;
-      height: calc(100dvh - 54px);
+      height: calc(100dvh - 42px);
+      flex: 1;
       background: #000;
       overflow: hidden;
       touch-action: none;
@@ -117,41 +60,43 @@
     #game canvas {
       max-width: 100%;
       max-height: 100%;
+      object-fit: contain;
       touch-action: none;
+    }
+
+    #status {
+      position: absolute;
+      z-index: 4;
+      top: 48px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      color: #55c8ff;
+      font-size: 12px;
+      pointer-events: none;
     }
 
     @media (orientation: landscape) {
       #header {
-        height: 38px;
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 34px;
+        min-height: 34px;
         background: transparent;
+        pointer-events: none;
       }
 
       #header h1 {
-        font-size: 17px;
-      }
-
-      #menuButton {
-        top: 0;
-        left: 8px;
+        font-size: 16px;
       }
 
       #game {
-        top: 0;
         height: 100dvh;
       }
 
       #status {
-        top: 40px;
-      }
-
-      #menuPanel {
-        top: 42px;
-      }
-    }
-
-    @media (max-width: 600px) and (orientation: portrait) {
-      #header h1 {
-        font-size: 19px;
+        top: 36px;
       }
     }
   </style>
@@ -160,26 +105,22 @@
 <body>
 
   <header id="header">
-    <button id="menuButton" aria-label="Abrir menu">☰</button>
     <h1>MEGA MAN X</h1>
   </header>
 
-  <nav id="menuPanel">
-    <button id="fullscreenButton">⛶ Tela cheia</button>
-    <button id="restartButton">↻ Reiniciar jogo</button>
-  </nav>
-
   <div id="status">Preparando seu jogo...</div>
+
   <div id="game"></div>
 
   <script>
-    // IDENTIFICAÇÃO DO JOGO
+    // IDENTIFICAÇÃO
     window.EJS_player = "#game";
     window.EJS_core = "snes";
+    window.EJS_controlScheme = "snes";
     window.EJS_gameName = "Mega Man X";
-    window.EJS_gameID = 1001;
+    window.EJS_gameID = "mega-man-x";
 
-    // ARQUIVO DO JOGO
+    // ROM
     window.EJS_gameUrl =
       "/jogos/megaman-x/mega-man-x.smc";
 
@@ -188,115 +129,97 @@
       "https://cdn.emulatorjs.org/stable/data/";
 
     window.EJS_startOnLoaded = true;
-    window.EJS_alignStartButton = "center";
-    window.EJS_color = "#55c8ff";
 
-    // SALVAMENTO DOS DADOS INTERNOS
+    // SALVAMENTO NORMAL AUTOMÁTICO
     window.EJS_fixedSaveInterval = 30000;
 
-    // SALVAMENTO DE ESTADOS NO NAVEGADOR
-    window.EJS_defaultOptions = {
-      "save-state-location": "browser"
-    };
-
-    // CONTROLES VIRTUAIS PERSONALIZADOS
+    // CONTROLES VIRTUAIS NO ESTILO SUPER NINTENDO
     window.EJS_VirtualGamepadSettings = [
+
+      // DIRECIONAL À ESQUERDA
       {
         type: "dpad",
         location: "left",
         left: "50%",
         right: "50%",
-        top: "50%",
         joystickInput: false,
         inputValues: [4, 5, 6, 7]
       },
 
+      // BOTÃO Y
       {
         type: "button",
         text: "Y",
         id: "y",
         location: "right",
-        left: 5,
-        top: 45,
+        left: 40,
+        top: 40,
         bold: true,
         input_value: 9
       },
+
+      // BOTÃO X
       {
         type: "button",
         text: "X",
         id: "x",
         location: "right",
-        left: 45,
-        top: 5,
+        left: 40,
+        top: 0,
         bold: true,
         input_value: 1
       },
+
+      // BOTÃO B
       {
         type: "button",
         text: "B",
         id: "b",
         location: "right",
-        left: 45,
-        top: 85,
+        left: 0,
+        top: 80,
         bold: true,
         input_value: 8
       },
+
+      // BOTÃO A
       {
         type: "button",
         text: "A",
         id: "a",
         location: "right",
-        left: 85,
-        top: 45,
+        left: 80,
+        top: 40,
         bold: true,
         input_value: 0
       },
 
+      // SELECT PEQUENO
       {
         type: "button",
         text: "SELECT",
         id: "select",
         location: "center",
-        left: -42,
-        top: 75,
+        left: -55,
         fontSize: 11,
+        block: true,
         input_value: 2
       },
+
+      // START PEQUENO
       {
         type: "button",
         text: "START",
         id: "start",
         location: "center",
-        left: 18,
-        top: 75,
+        left: 5,
         fontSize: 11,
+        block: true,
         input_value: 3
       }
     ];
 
-    // ESCONDE A BARRA DE OPÇÕES PADRÃO DO EMULADOR.
-    window.EJS_Buttons = {
-      playPause: false,
-      restart: false,
-      mute: false,
-      settings: false,
-      fullscreen: false,
-      saveState: false,
-      loadState: false,
-      screenRecord: false,
-      gamepad: false,
-      cheat: false,
-      volume: false,
-      saveSavFiles: false,
-      loadSavFiles: false,
-      quickSave: false,
-      quickLoad: false,
-      screenshot: false,
-      cacheManager: false,
-      exitEmulation: false
-    };
-
-    // MAPEAMENTO DO TECLADO NO COMPUTADOR
+    // TECLADO DO COMPUTADOR
     window.EJS_defaultControls = {
       0: {
         0: { value: "x", value2: "BUTTON_2" },
@@ -317,147 +240,30 @@
       3: {}
     };
 
+    // MENSAGENS DE CARREGAMENTO
     const status = document.getElementById("status");
-    const menu = document.getElementById("menuPanel");
 
-    // MENU DE TRÊS TRACINHOS
-    document.getElementById("menuButton").onclick = function() {
-      menu.classList.toggle("open");
+    window.EJS_ready = function() {
+      status.textContent = "MEGA MAN X pronto!";
     };
 
-    document.getElementById("fullscreenButton").onclick = function() {
-      const game = document.documentElement;
-
-      if (!document.fullscreenElement) {
-        game.requestFullscreen?.().catch(() => {});
-      } else {
-        document.exitFullscreen?.();
-      }
-
-      menu.classList.remove("open");
-    };
-
-    document.getElementById("restartButton").onclick = function() {
-      if (window.EJS_emulator?.gameManager) {
-        if (confirm("Deseja reiniciar o jogo?")) {
-          window.EJS_emulator.gameManager.restart();
-        }
-      }
-      menu.classList.remove("open");
-    };
-
-    // IDENTIFICADOR DO SALVAMENTO AUTOMÁTICO
-    const AUTO_SAVE_KEY = "mega-man-x-autosave.state";
-
-    let emulatorReady = false;
-    let saving = false;
-
-    // GRAVA O ESTADO COMPLETO NO ARMAZENAMENTO DO EMULADOR
-    async function saveCompleteState() {
-      if (!emulatorReady || saving) return;
-
-      const emulator = window.EJS_emulator;
-      const manager = emulator?.gameManager;
-      const storage = emulator?.storage?.states;
-
-      if (!manager?.getState || !storage?.put) return;
-
-      saving = true;
-
-      try {
-        const state = await manager.getState();
-
-        if (state && state.length) {
-          await storage.put(AUTO_SAVE_KEY, state);
-        }
-      } catch (error) {
-        console.warn("Não foi possível gravar o estado:", error);
-      } finally {
-        saving = false;
-      }
-    }
-
-    // RECUPERA O ESTADO ANTERIOR QUANDO O EMULADOR ESTIVER PRONTO
-    async function restoreCompleteState() {
-      const emulator = window.EJS_emulator;
-      const manager = emulator?.gameManager;
-      const storage = emulator?.storage?.states;
-
-      if (!manager?.loadState || !storage?.get) return;
-
-      try {
-        const savedState = await storage.get(AUTO_SAVE_KEY);
-
-        if (savedState && savedState.length) {
-          await manager.loadState(savedState);
-          status.textContent = "Seu progresso foi recuperado!";
-        } else {
-          status.textContent = "Mega Man X pronto! Divirta-se!";
-        }
-      } catch (error) {
-        console.warn("Não foi possível recuperar o estado:", error);
-        status.textContent = "Mega Man X pronto! Divirta-se!";
-      }
-    }
-
-    // AGUARDA O EMULADOR TERMINAR DE CARREGAR
-    window.EJS_ready = async function() {
-      status.textContent = "Preparando seus controles...";
-
-      let attempts = 0;
-
-      while (
-        !window.EJS_emulator?.gameManager &&
-        attempts < 100
-      ) {
-        await new Promise(resolve => setTimeout(resolve, 200));
-        attempts++;
-      }
-
-      if (!window.EJS_emulator?.gameManager) {
-        status.textContent = "Toque na tela para iniciar o jogo.";
-        return;
-      }
-
-      await restoreCompleteState();
-
-      emulatorReady = true;
-
-      if (!status.textContent.includes("recuperado")) {
-        status.textContent = "Mega Man X pronto! Divirta-se!";
-      }
-
-      // SALVAMENTO AUTOMÁTICO A CADA 30 SEGUNDOS
-      setInterval(saveCompleteState, 30000);
-    };
-
-    // TENTA SALVAR QUANDO A PÁGINA VAI PARA SEGUNDO PLANO
-    document.addEventListener("visibilitychange", function() {
-      if (document.visibilityState === "hidden") {
-        saveCompleteState();
-      }
-    });
-
-    window.addEventListener("pagehide", function() {
-      saveCompleteState();
-    });
-
-    // CARREGA O EMULADOR
+    // CARREGAR EMULADOR
     const loader = document.createElement("script");
 
     loader.src =
       "https://cdn.emulatorjs.org/stable/data/loader.js";
 
     loader.onload = function() {
-      status.textContent = "Carregando Mega Man X...";
+      status.textContent = "Carregando MEGA MAN X...";
     };
 
     loader.onerror = function() {
       status.textContent =
-        "Erro ao carregar o emulador. Verifique sua internet.";
+        "Erro ao carregar. Verifique sua conexão com a internet.";
     };
 
     document.body.appendChild(loader);
   </script>
+
 </body>
 </html>
