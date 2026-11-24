@@ -46,7 +46,23 @@
   <script>
     const romInput = document.getElementById("rom");
     const statusText = document.getElementById("status");
+document.addEventListener("keydown", function(event) {
+  const teclas = [
+    "ArrowUp",
+    "ArrowDown",
+    "ArrowLeft",
+    "ArrowRight",
+    " ",
+    "PageUp",
+    "PageDown",
+    "Home",
+    "End"
+  ];
 
+  if (teclas.includes(event.key)) {
+    event.preventDefault();
+  }
+}, { passive: false });
     romInput.addEventListener("change", function() {
       const file = this.files[0];
 
