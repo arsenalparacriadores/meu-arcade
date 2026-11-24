@@ -99,8 +99,6 @@
     window.EJS_pathtodata =
       "https://cdn.emulatorjs.org/stable/data/";
 
-    // O navegador pode exigir um toque para iniciar.
-    // O botão inicial do próprio emulador será mantido.
     window.EJS_startOnLoaded = false;
     window.EJS_startButtonName = "JOGAR";
     window.EJS_alignStartButton = "center";
@@ -109,13 +107,11 @@
     window.EJS_color = "#55c8ff";
     window.EJS_backgroundColor = "#000000";
 
-    // SALVAMENTO AUTOMÁTICO DOS DADOS DO JOGO
+    // SALVAMENTO NORMAL DO JOGO
     window.EJS_fixedSaveInterval = 30000;
 
-    // CONTROLES NO FORMATO DO SUPER NINTENDO
+    // CONTROLES
     window.EJS_VirtualGamepadSettings = [
-
-      // DIRECIONAL À ESQUERDA
       {
         type: "dpad",
         location: "left",
@@ -124,8 +120,6 @@
         joystickInput: false,
         inputValues: [4, 5, 6, 7]
       },
-
-      // X - EM CIMA
       {
         type: "button",
         text: "X",
@@ -136,8 +130,6 @@
         bold: true,
         input_value: 1
       },
-
-      // Y - À ESQUERDA
       {
         type: "button",
         text: "Y",
@@ -148,8 +140,6 @@
         bold: true,
         input_value: 9
       },
-
-      // A - À DIREITA
       {
         type: "button",
         text: "A",
@@ -160,8 +150,6 @@
         bold: true,
         input_value: 0
       },
-
-      // B - EMBAIXO
       {
         type: "button",
         text: "B",
@@ -172,8 +160,6 @@
         bold: true,
         input_value: 8
       },
-
-      // SELECT - PEQUENO, NO CENTRO
       {
         type: "button",
         text: "SELECT",
@@ -184,8 +170,6 @@
         block: true,
         input_value: 2
       },
-
-      // START - PEQUENO, AO LADO DO SELECT
       {
         type: "button",
         text: "START",
@@ -219,6 +203,185 @@
       3: {}
     };
 
+    // ==========================================
+    // SALVAMENTO AUTOMÁTICO DO ESTADO COMPLETO
+    // ==========================================
+
+    const SAVE_DB_NAME = "meu-arcade-saves";
+    const SAVE_DB_VERSION = 1;
+    const SAVE_STORE = "estados";
+    const SAVE_KEY = "mega-man-x-1001";
+
+    let saveDatabase = null;
+    let gameStarted = false;
+    let restoreFinished = false;
+    let saveInProgress = false;
+
+    // Abre o banco interno do navegador.
+    function openSaveDatabase() {
+      if (saveDatabase) {
+        return Promise.resolve(saveDatabase);
+      }
+
+      return new Promise((resolve, reject) => {
+        const request = indexedDB.open(
+          SAVE_DB_NAME,
+          SAVE_DB_VERSION
+        );
+
+        request.onupgradeneeded = function(event) {
+          const db = event.target.result;
+
+          if (!db.objectStoreNames.contains(SAVE_STORE)) {
+            db.createObjectStore(SAVE_STORE);
+          }
+        };
+
+        request.onsuccess = function(event) {
+          saveDatabase = event.target.result;
+
+          saveDatabase.onversionchange = function() {
+            saveDatabase.close();
+            saveDatabase = null;
+          };
+
+          resolve(saveDatabase);
+        };
+
+        request.onerror = function() {
+          reject(request.error);
+        };
+      });
+    }
+
+    // Grava o estado no banco do navegador.
+    async function storeGameState(buffer) {
+      const db = await openSaveDatabase();
+
+      return new Promise((resolve, reject) => {
+        const transaction = db.transaction(
+          SAVE_STORE,
+          "readwrite"
+        );
+
+        transaction.objectStore(SAVE_STORE).put(
+          buffer,
+          SAVE_KEY
+        );
+
+        transaction.oncomplete = resolve;
+        transaction.onerror = () => reject(transaction.error);
+        transaction.onabort = () => reject(transaction.error);
+      });
+    }
+
+    // Recupera o último estado salvo.
+    async function readGameState() {
+      const db = await openSaveDatabase();
+
+      return new Promise((resolve, reject) => {
+        const transaction = db.transaction(
+          SAVE_STORE,
+          "readonly"
+        );
+
+        const request = transaction
+          .objectStore(SAVE_STORE)
+          .get(SAVE_KEY);
+
+        request.onsuccess = () => resolve(request.result || null);
+        request.onerror = () => reject(request.error);
+      });
+    }
+
+    // Salva o ponto exato em que o jogo está.
+    async function saveCurrentGame() {
+      if (!gameStarted || !restoreFinished || saveInProgress) {
+        return;
+      }
+
+      const manager =
+        window.EJS_emulator &&
+        window.EJS_emulator.gameManager;
+
+      if (!manager || typeof manager.getState !== "function") {
+        return;
+      }
+
+      saveInProgress = true;
+
+      try {
+        const state = await manager.getState();
+
+        if (!state || state.length === 0) {
+          return;
+        }
+
+        const buffer = new Uint8Array(state).slice().buffer;
+
+        await storeGameState(buffer);
+
+        console.log("Progresso do MEGA MAN X salvo no navegador.");
+      } catch (error) {
+        console.error("Erro ao salvar o progresso:", error);
+      } finally {
+        saveInProgress = false;
+      }
+    }
+
+    // Restaura o último ponto salvo quando o jogo começa.
+    async function restorePreviousGame() {
+      const manager =
+        window.EJS_emulator &&
+        window.EJS_emulator.gameManager;
+
+      if (!manager || typeof manager.loadState !== "function") {
+        restoreFinished = true;
+        return;
+      }
+
+      try {
+        const savedState = await readGameState();
+
+        if (savedState) {
+          manager.loadState(new Uint8Array(savedState));
+
+          console.log("Progresso anterior restaurado.");
+        } else {
+          console.log("Nenhum progresso anterior encontrado.");
+        }
+      } catch (error) {
+        console.error("Erro ao restaurar o progresso:", error);
+      } finally {
+        restoreFinished = true;
+      }
+    }
+
+    // Chamado pelo EmulatorJS quando o jogo começa.
+    window.EJS_onGameStart = function() {
+      gameStarted = true;
+      restoreFinished = false;
+
+      restorePreviousGame();
+    };
+
+    // Salvamento periódico: a cada 20 segundos.
+    setInterval(function() {
+      saveCurrentGame();
+    }, 20000);
+
+    // Tenta salvar quando a pessoa troca de aba ou aplicativo.
+    document.addEventListener("visibilitychange", function() {
+      if (document.visibilityState === "hidden") {
+        saveCurrentGame();
+      }
+    });
+
+    // Tenta salvar quando a página é fechada.
+    window.addEventListener("pagehide", function() {
+      saveCurrentGame();
+    });
+
     // MENSAGEM DE CARREGAMENTO
     window.EJS_ready = function() {
       console.log("MEGA MAN X carregado.");
@@ -226,6 +389,7 @@
 
     // CARREGAR EMULATORJS
     const loader = document.createElement("script");
+
     loader.src =
       "https://cdn.emulatorjs.org/stable/data/loader.js";
 
