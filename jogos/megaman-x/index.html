@@ -6,13 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <meta name="theme-color" content="#101522">
   <title>MEGA MAN X | Meu Arcade</title>
-
   <style>
-    * {
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
-
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     html, body {
       margin: 0;
       padding: 0;
@@ -23,30 +18,10 @@
       font-family: Arial, sans-serif;
       overscroll-behavior: none;
     }
-
-    body {
-      text-align: center;
-      padding: 8px;
-    }
-
-    h1 {
-      color: #55c8ff;
-      font-size: 25px;
-      margin: 8px 0 3px;
-    }
-
-    .subtitle {
-      color: #c5d5e5;
-      font-size: 13px;
-      margin: 0 0 8px;
-    }
-
-    #status {
-      color: #55c8ff;
-      font-size: 14px;
-      margin: 10px;
-    }
-
+    body { text-align: center; padding: 8px; }
+    h1 { color: #55c8ff; font-size: 25px; margin: 8px 0 3px; }
+    .subtitle { color: #c5d5e5; font-size: 13px; margin: 0 0 8px; }
+    #status { color: #55c8ff; font-size: 14px; margin: 10px; }
     #game {
       width: 100%;
       max-width: 1100px;
@@ -58,54 +33,26 @@
       overflow: hidden;
       touch-action: none;
     }
-
-    #game canvas {
-      max-width: 100%;
-      touch-action: none;
-    }
-
-    .instructions {
-      color: #aab8ca;
-      font-size: 12px;
-      margin: 8px;
-    }
-
+    #game canvas { max-width: 100%; touch-action: none; }
+    .instructions { color: #aab8ca; font-size: 12px; margin: 8px; }
     @media (max-width: 600px) {
       body { padding: 4px; }
       h1 { font-size: 22px; }
-
-      #game {
-        height: 72vh;
-        min-height: 280px;
-      }
+      #game { height: 72vh; min-height: 280px; }
     }
-
     @media (orientation: landscape) and (max-height: 600px) {
       body { padding: 2px; }
       h1, .subtitle { display: none; }
-
-      #game {
-        height: 94vh;
-        min-height: 200px;
-        margin: 2px auto;
-      }
-
-      #status, .instructions {
-        font-size: 10px;
-        margin: 2px;
-      }
+      #game { height: 94vh; min-height: 200px; margin: 2px auto; }
+      #status, .instructions { font-size: 10px; margin: 2px; }
     }
   </style>
 </head>
-
 <body>
   <h1>MEGA MAN X</h1>
   <p class="subtitle">Meu Arcade</p>
-
   <p id="status">Preparando seu jogo...</p>
-
   <div id="game"></div>
-
   <p class="instructions">
     Celular: use os controles virtuais na tela.<br>
     Computador: use as setas direcionais e teclas de ação.
@@ -115,16 +62,18 @@
     window.EJS_player = "#game";
     window.EJS_core = "snes";
     window.EJS_gameName = "Mega Man X";
-    window.EJS_gameID = "mega-man-x";
-
-    window.EJS_gameUrl =
-      "/jogos/megaman-x/mega-man-x.smc";
-
-    window.EJS_pathtodata =
-      "https://cdn.emulatorjs.org/stable/data/";
-
+    window.EJS_gameID = 1001;
+    window.EJS_gameUrl = "/jogos/megaman-x/mega-man-x.smc";
+    window.EJS_pathtodata = "https://cdn.emulatorjs.org/stable/data/";
     window.EJS_startOnLoaded = true;
+
+    // Grava os dados de salvamento automaticamente a cada 30 segundos.
     window.EJS_fixedSaveInterval = 30000;
+
+    // Prioriza o armazenamento dos estados no próprio navegador.
+    window.EJS_defaultOptions = {
+      "save-state-location": "browser"
+    };
 
     window.EJS_defaultControls = {
       0: {
@@ -153,17 +102,14 @@
     };
 
     const loader = document.createElement("script");
-
-    loader.src =
-      "https://cdn.emulatorjs.org/stable/data/loader.js";
+    loader.src = "https://cdn.emulatorjs.org/stable/data/loader.js";
 
     loader.onload = function() {
       status.textContent = "Carregando Mega Man X...";
     };
 
     loader.onerror = function() {
-      status.textContent =
-        "Erro ao carregar o emulador. Verifique sua internet.";
+      status.textContent = "Erro ao carregar o emulador. Verifique sua internet.";
     };
 
     document.body.appendChild(loader);
