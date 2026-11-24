@@ -4,13 +4,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  <title>Mega Man X | Meu Arcade</title>
+  <title>Mega Men X | Meu Arcade</title>
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     html, body {
       margin: 0;
@@ -31,19 +28,7 @@
       margin-bottom: 8px;
     }
 
-    .subtitulo {
-      color: #c5d5e5;
-    }
-
-    #rom {
-      display: block;
-      max-width: 100%;
-      margin: 18px auto;
-      padding: 10px;
-      background: #202b3d;
-      color: white;
-      border-radius: 8px;
-    }
+    .subtitulo { color: #c5d5e5; }
 
     #status {
       color: #55c8ff;
@@ -59,12 +44,9 @@
       background: #000;
       border-radius: 10px;
       overflow: hidden;
-      touch-action: manipulation;
     }
 
-    #game canvas {
-      max-width: 100%;
-    }
+    #game canvas { max-width: 100%; }
 
     .aviso {
       color: #aab8ca;
@@ -73,14 +55,8 @@
     }
 
     @media (max-width: 600px) {
-      body {
-        padding: 8px;
-      }
-
-      h1 {
-        font-size: 25px;
-      }
-
+      body { padding: 8px; }
+      h1 { font-size: 25px; }
       #game {
         height: 65vh;
         min-height: 280px;
@@ -90,107 +66,50 @@
 </head>
 
 <body>
-
-  <h1>MEGA MAN X</h1>
-
+  <h1>MEGA MEN X</h1>
   <p class="subtitulo">Meu Arcade</p>
 
-  <p>Selecione uma ROM de Super Nintendo autorizada:</p>
-
-  <input
-    type="file"
-    id="rom"
-    accept=".smc,.sfc"
-  >
-
-  <p id="status">Aguardando o jogo...</p>
-
+  <p id="status">Preparando seu jogo...</p>
   <div id="game"></div>
 
   <p class="aviso">
-    Os controles de toque estarão disponíveis na interface móvel do emulador.
+    O jogo é carregado automaticamente.
+    Os controles de toque estarão disponíveis em dispositivos móveis.
   </p>
 
   <script>
-    const romInput = document.getElementById("rom");
-    const statusText = document.getElementById("status");
+    window.EJS_player = "#game";
+    window.EJS_core = "snes";
+    window.EJS_gameName = "Mega Men X";
+    window.EJS_gameID = "mega-men-x";
 
-    window.arcadeStarted = false;
+    window.EJS_gameUrl = "./mega-men-x.smc";
 
-    // Impede que as teclas do jogo rolem a página no computador.
-    window.addEventListener("keydown", function(event) {
-      if (!window.arcadeStarted) return;
+    window.EJS_fixedSaveInterval = 30000;
+    window.EJS_startOnLoaded = true;
+    window.EJS_pathtodata =
+      "https://cdn.emulatorjs.org/stable/data/";
 
-      if (document.activeElement === romInput) return;
+    window.EJS_ready = function() {
+      document.getElementById("status").textContent =
+        "Jogo pronto! Divirta-se!";
+    };
 
-      const teclasDoJogo = [
-        "ArrowUp",
-        "ArrowDown",
-        "ArrowLeft",
-        "ArrowRight",
-        " ",
-        "Space",
-        "PageUp",
-        "PageDown",
-        "Home",
-        "End"
-      ];
+    const loader = document.createElement("script");
+    loader.src =
+      "https://cdn.emulatorjs.org/stable/data/loader.js";
 
-      if (
-        teclasDoJogo.includes(event.key) ||
-        teclasDoJogo.includes(event.code)
-      ) {
-        event.preventDefault();
-      }
-    }, { capture: true, passive: false });
+    loader.onerror = function() {
+      document.getElementById("status").textContent =
+        "Não foi possível carregar o emulador. Verifique sua conexão.";
+    };
 
-    romInput.addEventListener("change", function() {
-      const file = this.files[0];
+    loader.onload = function() {
+      document.getElementById("status").textContent =
+        "Carregando o jogo...";
+    };
 
-      if (!file) return;
-
-      statusText.textContent = "Preparando o Mega Man X...";
-
-      window.EJS_player = "#game";
-      window.EJS_core = "snes";
-      window.EJS_gameName = "Mega Man X";
-      window.EJS_gameID = 101;
-
-      // Grava os dados de salvamento periodicamente.
-      window.EJS_fixedSaveInterval = 30000;
-
-      // Prioriza a interface com controles de toque.
-      window.EJS_browserMode = "mobile";
-
-      window.EJS_startOnLoaded = true;
-
-      window.EJS_gameUrl = URL.createObjectURL(file);
-
-      window.EJS_pathtodata =
-        "https://cdn.emulatorjs.org/stable/data/";
-
-      window.EJS_ready = function() {
-        statusText.textContent = "Mega Man X pronto para jogar!";
-        window.arcadeStarted = true;
-      };
-
-      const loader = document.createElement("script");
-
-      loader.src =
-        "https://cdn.emulatorjs.org/stable/data/loader.js";
-
-      loader.onload = function() {
-        statusText.textContent = "Carregando o jogo...";
-      };
-
-      loader.onerror = function() {
-        statusText.textContent =
-          "Erro ao carregar o emulador. Verifique sua conexão.";
-      };
-
-      document.body.appendChild(loader);
-    });
+    document.body.appendChild(loader);
   </script>
-
 </body>
 </html>
