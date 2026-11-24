@@ -55,8 +55,9 @@
       statusText.textContent = "Carregando o emulador...";
 
       window.EJS_player = "#game";
-      window.EJS_core = "snes9x";
-      window.EJS_gameName = "Mega Man X";
+      window.EJS_core = "snes";
+window.EJS_gameUrl = file;
+window.EJS_startOnLoaded = true;
       window.EJS_gameID = 101;
       window.EJS_gameUrl = URL.createObjectURL(file);
       window.EJS_pathtodata =
