@@ -50,7 +50,6 @@
       background: #000;
       overflow: hidden;
       position: relative;
-      touch-action: none;
     }
 
     #game canvas {
@@ -88,15 +87,11 @@
   <script>
     // JOGO
     window.EJS_player = "#game";
-    window.EJS_core = "snes";
+    window.EJS_core = "bsnes";
     window.EJS_gameName = "Aladdin";
     window.EJS_gameID = 1002;
-
-    // ENDEREÇO AUTOMÁTICO DA ROM
-    window.EJS_gameUrl = new URL(
-      "aladdin.smc",
-      window.location.href
-    ).href;
+    window.EJS_gameUrl =
+      "/meu-arcade/jogos/aladdin/aladdin.smc";
 
     // EMULADOR
     window.EJS_pathtodata =
@@ -206,16 +201,13 @@
       3: {}
     };
 
-    // ==========================================
     // SALVAMENTO AUTOMÁTICO NO NAVEGADOR
-    // ==========================================
-
     const SAVE_DB_NAME = "meu-arcade-saves";
     const SAVE_DB_VERSION = 1;
     const SAVE_STORE = "estados";
 
-    // CHAVE NOVA PARA NÃO RESTAURAR UM ESTADO ANTIGO
-    const SAVE_KEY = "aladdin-1002-teste-inicial";
+    // CHAVE NOVA: preserva o salvamento anterior
+    const SAVE_KEY = "aladdin-1002-bsnes-test";
 
     let saveDatabase = null;
     let gameStarted = false;
@@ -378,7 +370,6 @@
       saveCurrentGame();
     });
 
-    // MENSAGEM DE CARREGAMENTO
     window.EJS_ready = function() {
       console.log("ALADDIN carregado.");
     };
