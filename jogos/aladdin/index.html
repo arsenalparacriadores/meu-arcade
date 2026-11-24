@@ -91,8 +91,12 @@
     window.EJS_core = "snes";
     window.EJS_gameName = "Aladdin";
     window.EJS_gameID = 1002;
-    window.EJS_gameUrl =
-      "/meu-arcade/jogos/aladdin/aladdin.smc";
+
+    // ENDEREÇO AUTOMÁTICO DA ROM
+    window.EJS_gameUrl = new URL(
+      "aladdin.smc",
+      window.location.href
+    ).href;
 
     // EMULADOR
     window.EJS_pathtodata =
@@ -209,7 +213,9 @@
     const SAVE_DB_NAME = "meu-arcade-saves";
     const SAVE_DB_VERSION = 1;
     const SAVE_STORE = "estados";
-    const SAVE_KEY = "aladdin-1002";
+
+    // CHAVE NOVA PARA NÃO RESTAURAR UM ESTADO ANTIGO
+    const SAVE_KEY = "aladdin-1002-teste-inicial";
 
     let saveDatabase = null;
     let gameStarted = false;
