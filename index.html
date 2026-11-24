@@ -2,82 +2,108 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#171321">
-  <title>Meu Arcade</title>
-  <style>
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      min-height: 100vh;
-      background: #171321;
-      color: #fff;
-      font-family: Arial, sans-serif;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
-    }
-
-    main {
-      width: 100%;
-      max-width: 600px;
-      text-align: center;
-    }
-
-    .logo {
-      font-size: 52px;
-      margin-bottom: 12px;
-    }
-
-    h1 {
-      font-size: 36px;
-      margin: 0 0 12px;
-    }
-
-    p {
-      color: #c5bfd3;
-      line-height: 1.6;
-    }
-
-    .console {
-      margin-top: 32px;
-      padding: 28px;
-      border: 2px solid #6953a5;
-      border-radius: 24px;
-      background: #231d32;
-    }
-
-    .screen {
-      min-height: 180px;
-      border-radius: 14px;
-      background: #111;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 48px;
-    }
-
-    .status {
-      color: #b9a1ff;
-      font-size: 14px;
-      margin-top: 20px;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#080B12">
+<title>Meu Arcade</title>
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  min-height:100vh;
+  background:#080B12;
+  color:#fff;
+  font-family:Arial,sans-serif;
+}
+header{
+  padding:42px 20px 30px;
+  text-align:center;
+  background:linear-gradient(180deg,#171d35,#080B12);
+}
+.logo{font-size:48px}
+h1{
+  margin:8px 0;
+  font-size:clamp(32px,7vw,52px);
+  letter-spacing:2px;
+}
+header p{color:#b8c2d8;margin:8px 0}
+main{
+  width:min(900px,92%);
+  margin:25px auto 60px;
+}
+h2{
+  font-size:20px;
+  letter-spacing:2px;
+  text-align:center;
+  margin:25px 0;
+}
+.jogos{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+  gap:18px;
+}
+.card{
+  display:block;
+  text-decoration:none;
+  color:white;
+  background:#151d30;
+  border:1px solid #344565;
+  border-radius:18px;
+  padding:24px;
+  text-align:center;
+  transition:transform .2s,border-color .2s;
+}
+.card:hover{
+  transform:translateY(-4px);
+  border-color:#55c8ff;
+}
+.icone{font-size:48px;margin-bottom:12px}
+.card h3{margin:8px 0;font-size:22px}
+.card p{color:#aebbd2;font-size:14px;line-height:1.5}
+.abrir{
+  display:inline-block;
+  margin-top:12px;
+  padding:11px 22px;
+  border-radius:25px;
+  background:#287db5;
+  font-weight:bold;
+  font-size:13px;
+}
+footer{
+  text-align:center;
+  color:#66738c;
+  font-size:12px;
+  padding:25px;
+}
+</style>
 </head>
 <body>
-  <main>
-    <div class="logo">🕹️</div>
-    <h1>Meu Arcade</h1>
-    <p>Sua coleção de jogos retrô, em um só lugar.</p>
+<header>
+  <div class="logo">🕹️</div>
+  <h1>MEU ARCADE</h1>
+  <p>Sua coleção de jogos retrô, em um só lugar.</p>
+</header>
 
-    <section class="console">
-      <div class="screen">👾</div>
-      <p>Seu próximo jogo começa aqui.</p>
-      <div class="status">ARCADE EM CONSTRUÇÃO</div>
-    </section>
-  </main>
+<main>
+  <h2>ESCOLHA SEU JOGO</h2>
+
+  <section class="jogos">
+    <a class="card" href="./jogos/megaman-x/">
+      <div class="icone">🤖</div>
+      <h3>MEGA MAN X</h3>
+      <p>Prepare-se para uma aventura de ação no Super Nintendo.</p>
+      <span class="abrir">JOGAR</span>
+    </a>
+
+    <a class="card" href="./jogos/aladdin/">
+      <div class="icone">🕌</div>
+      <h3>ALADDIN</h3>
+      <p>Uma aventura clássica em uma jornada pelo mundo de Agrabah.</p>
+      <span class="abrir">JOGAR</span>
+    </a>
+  </section>
+</main>
+
+<footer>MEU ARCADE · JOGUE DIRETO NO NAVEGADOR</footer>
 </body>
 </html>
